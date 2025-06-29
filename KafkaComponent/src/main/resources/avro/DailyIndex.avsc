@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "DailyIndex",
+  "namespace": "com.kafmongo.kafmongo.utils",
+  "fields": [
+    {
+      "name": "symbol",
+      "type": "string"
+    },
+    {
+      "name": "date",
+      "type": "string"
+    },
+    {
+      "name": "index",
+      "type": "string"
+    },
+    {
+      "name": "value",
+      "type": "string"
+    }
+  ]
+}

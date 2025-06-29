@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "PortfolioMetrics",
+  "namespace": "com.kafmongo.kafmongo.utils",
+  "fields": [
+    {
+      "name": "risk",
+      "type": "double"
+    },
+    {
+      "name": "expectedReturn",
+      "type": "double"
+    },
+    {
+      "name": "sharpRatio",
+      "type": "double"
+    },
+    {
+      "name": "timestamp",
+      "type": "long"
+    }
+  ]
+}

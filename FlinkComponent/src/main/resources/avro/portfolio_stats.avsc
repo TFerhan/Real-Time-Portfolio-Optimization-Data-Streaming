@@ -1,0 +1,28 @@
+{
+  "type": "record",
+  "name": "PortfolioStatsSchema",
+  "namespace": "com.popud.util",
+  "fields": [
+    {
+      "name": "timestamp",
+      "type": "long"
+    },
+    {
+      "name": "meanReturns",
+      "type": {
+        "type": "map",
+        "values": "double"
+      }
+    },
+    {
+      "name": "covarianceMatrix",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "map",
+          "values": "double"
+        }
+      }
+    }
+  ]
+}
