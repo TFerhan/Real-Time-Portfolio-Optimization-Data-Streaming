@@ -6,7 +6,11 @@ Weights are initialized using the Black-Litterman model. As new prices are strea
 
 Due to lack of access to the official real-time API from the Casablanca Stock Exchange (which is regulated and paid), the project simulates real-time data using a scheduler-based polling approach on their public API. While the Moroccan market lacks high-frequency data like larger exchanges (e.g. NSE, LSE), the simulation is sufficient for system behavior testing and integration validation.
 
-Data ingestion is handled through a structured AVRO schema, serialized and transmitted via Kafka. Each asset price is encapsulated in a schema-compliant class to ensure compatibility across consumers. The AVRO schema definitions are stored in the Kafka component under the `resources` directory. Kafka topics are partitioned to enable parallel data processing and distributed scalability. Configuration files for the Kafka producer are located under the `Producer` directory, and all relevant Kafka parameters are documented there.
+Data ingestion is handled through a structured AVRO schema:
+
+
+
+serialized and transmitted via Kafka. Each asset price is encapsulated in a schema-compliant class to ensure compatibility across consumers. The AVRO schema definitions are stored in the Kafka component under the `resources` directory. Kafka topics are partitioned to enable parallel data processing and distributed scalability. Configuration files for the Kafka producer are located under the `Producer` directory, and all relevant Kafka parameters are documented there.
 
 Additional data sources, including index-level and daily price APIs, are used to support the initial weight allocation and can also be integrated into the live stream. Once prices are flowing, the same pipeline infrastructure is applied to weights and portfolio statistics to establish the system state before switching to streaming-only for prices.
 
