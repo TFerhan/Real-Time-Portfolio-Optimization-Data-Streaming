@@ -1,3 +1,242 @@
-# Real-Time-Portfolio-Optimization-Data-Streaming
+# Real-Time Portfolio Optimization & Data Streaming
 
-This project aim to optimize in real time a portfolio of assets, a use case for Moroccan stock exchange, Casablanca Stock exchange precisely, its not a web app just fully backend to visualization, the goal was to stream stock prices in real time of 10 assets initialized weights by black Litterman model, the resulting covariance matrice and expected reutrns would be updated each time a new stock price got produced by the Welford online algorithm so that to compute the new sharpe ratio that would me a metric to see if an optimization or re allocation of weights must be held, giving a threshold, and the whole keep repeating it self to reduce latency and save the system from losing on risk, here its assumed a neutral risk averse person of one, you can modify it anyway, this project is just a use case from scratch giving an API even if the Casablanca Stock exchange dont allow to personals to use their websocket or realtime API as its paid and regulated, managed to use their public website API simulating real time with a scheduler of every 2 ms, even if the moroccan market isnt very volumuny or liquidative to simulate the real real time, not like big markets like NSE or LSE so its just a simulation, so the API get the prices and using AVRO Schema to send and produce the prices in a strutured way as it must sent in bytes and deseralized back to a formal class , you may find the avro schema corresponding to each class in the kafka component folder under the resources folder, after producing that data into a kafka topic , we set in configuration the number of partition to allow parallelization or in other term distributed that is the main objective of this whole project, you may find also the whole configuration in the Producer folder in the kafka folder, you can check the documentation of kafka to understand each configuration. Included other functions or APIs of index prices and daily prices API those were used to calculate and intialize the weights in first place but they also may be integrated in the pipeline in real time. Leaving that, after producing the prices, samething we can do with the weights and the portfolio stats as the covariance and the expected return, just to initialize the pipeline after that solely the stock prices that get streamed. In the second phase, the prices got consumed by the second component Flink, that set watermarks upon each message that its consumed and also process the whole thing as event time (even if in the latest versions of Flink they removed the processing time ) so that the time be consistent with the time of the actual trade and not when its produced by the system, also setting the offset to latest to consume just the latest messages and not confused with earliest. After setting up each consumer we set the watermarks, then the datasource objects. For the weight and portfolio stats sources we map by the portfolio ID, as each portfolio has a set of weights and his statistics, for the prices we map by the ticker, after maping each of those last we perform a windowed log return job, that being said what it does, is taking a window time like an interval of time after stacking streamed prices into a window of time so that we can calculate the return or in our case the log return, adding a random standard epsilon to the starting price is done as we are just simulating real time stock market to get consistent results, you may find that function in the utils folder of the Flink component, LogReturnWindowFunction, after getting those returns we can now update the portfolio stats (covariance and expected returns), to use that we need to merge the two streaming jobs, the logreturn stream and connect it with the keyed portoflio stats stream. After setting the context, we can now enter the principal function of Flink is the stateful distributed processing as Kafka only stream messages (it may manipulate but limited somehow) using stateful streaming processing, we can using a value state variable of portfolio stats, to update this last one with each new log return and it stays in the full state and can also be saved in a rocksdb as a checkpoint so in case of a failure you can continue from that checkpoint (not implemented here). The main utility of this function PortfolioUpdate is that she can merge two upcoming streams, in this business case, updating the portfolio stats using the Welford online algorithm to update the covariance and the mean Returns in real times and saving them back on the same state so we get in a nearly consistent reliable time the backbone to optimize the portfolio. That being said we get those updated portfolio stats back in a new topic of new portfolio stats so in a new Kafka sink. Now that we have all, from the weights to the stats, we can compute the portfolio metrics, as earliest we connect those last two outcomes with a coprocessing funxtion job , PortfolioMetricsFunction, in this function we use three value states of weights, stats and metrics so that whenever one of the streamed object get into like if weight come the metrics got updated if the stats get changed the metrics get updated, we use the classical formula to compute the sharpe ratio, expected return - risk free / risk , risk is computed by rising the squared root of the standard deviation calculated from the covariance, to finaly get in real time the update sharpe ratio. Getting that last value dont bring us much value unless we interpreted it, means unless setting a threshold to give it a meaning of which is good or bad, then what ? here it breaches a threshold, a notification ? you may be in travel or whatever and you want all automated for you, that is when the last component come to place using a Python layer we stream the resulting sharpe ratio and the other metrics into a new Portfolio Metric Kafka sink, to be later consumed by Python. Now creating a consumer class in python to consume the weights the portfolio metrics and the portfolio stats, we set the existing consumer configurations .... 
+This project aims to optimize an asset portfolio in **real-time**, specifically using a use case based on the **Moroccan stock exchange** (Casablanca Stock Exchange). It is a fully backend system focused on **stream processing**, **portfolio reallocation**, and **metric visualization**. There is no web interface — everything is handled through distributed data pipelines.
+
+---
+
+## 🧠 Project Overview
+
+The core idea is to simulate and optimize portfolio weights based on real-time price streaming of 10 selected assets. It leverages the **Black-Litterman model** for initial portfolio weight allocation.
+
+The system:
+- Streams simulated stock prices.
+- Updates the **covariance matrix** and **expected returns** using the **Welford online algorithm**.
+- Recalculates the **Sharpe ratio** as a key metric.
+- If the Sharpe ratio falls below a defined threshold, triggers **portfolio reallocation**.
+
+---
+
+## ⚙️ Architecture
+
+```text
++-------------------------+
+|     Price Producer      |
+|  (Kafka + Scheduler)    |
++-------------------------+
+           |
+           v
++-------------------------+
+|      Flink Consumer     |
+|  - Windowed Log Return  |
+|  - Portfolio Stats      |
+|  - Sharpe Ratio Calc    |
++-------------------------+
+           |
+           v
++-------------------------+
+|    Portfolio Updater    |
+|  (Python Consumer +     |
+|   Rebalancing Logic)    |
++-------------------------+
+           |
+           v
++-------------------------+
+|  Metrics Visualization  |
+| (Grafana + InfluxDB)    |
++-------------------------+
+````
+
+---
+
+## 🧩 Key Components
+
+### 1. Kafka Producer (Java/Scala)
+
+* **Simulated Real-Time Pricing**:
+
+  * Uses a scheduler to fetch stock prices every 2ms (approximate simulation).
+  * Data is pulled from the Casablanca Stock Exchange public API.
+* **AVRO Serialization**:
+
+  * Prices are serialized using AVRO for efficiency and schema enforcement.
+  * AVRO schemas are located in:
+
+    ```
+    /kafka/Producer/src/main/resources/avro/
+    ```
+* **Topics**:
+
+  * `stock-prices`
+  * `portfolio-stats`
+  * `weights`
+
+> 📁 *Kafka producer config files can be found under:*
+> `/kafka/Producer/src/main/resources/config/`
+
+---
+
+### 2. Apache Flink (Java/Scala)
+
+* **Real-Time Stream Processing**:
+
+  * Watermarks are used to ensure event-time accuracy.
+  * Each price is mapped by `ticker`, and weights/stats are mapped by `portfolioId`.
+
+* **Windowed Log Return Calculation**:
+
+  * Implemented in:
+
+    ```
+    /flink/src/main/java/utils/LogReturnWindowFunction.java
+    ```
+  * Adds a small epsilon for numerical consistency during simulation.
+
+* **Portfolio Statistics Update**:
+
+  * Covariance matrix and expected returns are updated with Welford's algorithm.
+  * Handled in:
+
+    ```
+    /flink/src/main/java/functions/PortfolioUpdateFunction.java
+    ```
+
+* **Sharpe Ratio Calculation**:
+
+  * Combines latest weights and stats using a `CoProcessFunction`.
+  * Formula:
+
+    ```
+    Sharpe Ratio = (Expected Return - Risk Free Rate) / Portfolio Risk
+    ```
+
+---
+
+### 3. Python Rebalancer
+
+* **Consumer using `kafka-python`**:
+
+  * Consumes:
+
+    * Portfolio Weights
+    * Portfolio Metrics (Sharpe Ratio, Expected Returns, etc.)
+    * Portfolio Stats (Covariance Matrix)
+
+* **Mean-Variance Optimization**:
+
+  * Reallocation triggered if Sharpe ratio breaches a threshold.
+  * Uses [`PyPortfolioOpt`](https://github.com/robertmartin8/PyPortfolioOpt) with regularization for diversification.
+
+* **Publishes New Weights**:
+
+  * Sends updated weights back to the Kafka topic `weights`.
+
+---
+
+## 📊 Visualization
+
+* **Grafana + InfluxDB**:
+
+  * All metrics and portfolio updates are stored and visualized in real-time.
+  * Alerts can be configured (e.g., via email) if thresholds are crossed.
+
+* **Optional Storage**:
+
+  * Data can be persisted to:
+
+    * **TimeScaleDB** (aka TigerDB)
+    * **MongoDB Time Series**
+
+---
+
+## 🔐 DevOps & Deployment
+
+* **Kubernetes**:
+
+  * Manages deployment for:
+
+    * Kafka brokers
+    * Flink jobs
+    * Grafana dashboards
+    * InfluxDB
+
+* **Cloud Deployment (Planned)**:
+
+  * Future support for AWS:
+
+    * **MSK (Managed Kafka)**
+    * **Amazon Flink**
+    * **EC2 Instances**
+
+---
+
+## 📌 Getting Started
+
+### Prerequisites
+
+* Apache Kafka
+* Apache Flink
+* Python 3.9+
+* Docker / Kubernetes (Optional)
+* InfluxDB & Grafana
+* TimeScaleDB / MongoDB (optional for long-term storage)
+
+---
+
+## 🧪 Running the Project
+
+1. **Kafka Setup**
+
+   * Run Kafka and Zookeeper.
+   * Configure AVRO serializers.
+   * Launch the price producer.
+
+     > 📍 Code location: `/kafka/Producer/`
+
+2. **Flink Jobs**
+
+   * Launch the Flink streaming job:
+
+     * Log return calculator
+     * Portfolio update logic
+     * Sharpe ratio calculation
+
+     > 📍 Code location: `/flink/`
+
+3. **Python Optimizer**
+
+   * Run the Python consumer.
+   * Start weight reallocation and streaming based on metric threshold.
+
+     > 📍 Code location: `/python/optimizer/`
+
+4. **Visualization**
+
+   * Connect InfluxDB to Grafana.
+   * Configure dashboards and alerts.
+
+---
+
+## 🧠 Notes & Considerations
+
+* **Risk Profile**: Assumes a neutral risk-averse investor (risk aversion = 1). You can modify this as needed.
+* **Real-Time Simulation**: Casablanca Exchange doesn’t provide free real-time WebSocket APIs, so prices are **simulated using polling**.
+* **Latency**: While Morocco's stock market has lower liquidity than major global exchanges, the simulation tries to maintain consistent behavior.
+
+---
+
+## 🛠️ Contributing
+
+Contributions are welcome! If you want to improve this project, feel free to fork it, submit PRs, or open issues.
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙋 Contact
+
+For questions or feedback, reach out via GitHub Issues or open a discussion in the project.
+
