@@ -2,6 +2,11 @@
 
 This project implements a real-time portfolio optimization pipeline, specifically targeting assets listed on the Casablanca Stock Exchange. It’s designed as a fully backend system focused on data flow and analytics, with no frontend interface. The core objective is to stream real-time stock prices for 10 selected assets and dynamically adjust portfolio allocations based on calculated risk-return metrics.
 
+![real_time_portfolio](https://github.com/user-attachments/assets/6217950a-10c3-4a3b-9e32-2e46ba70ba98)
+
+![real_time_weight](https://github.com/user-attachments/assets/497d813f-053f-429f-95fa-04defa61e962)
+
+
 Weights are initialized using the Black-Litterman model. As new prices are streamed, the system updates the covariance matrix and expected returns using the Welford online algorithm. These updated statistics are used to compute the Sharpe ratio, which serves as the primary optimization trigger. When a defined threshold is crossed, a reallocation process is initiated to optimize performance. The loop continuously runs to minimize latency and manage risk exposure, assuming a risk-aversion coefficient of one (configurable).
 
 Due to lack of access to the official real-time API from the Casablanca Stock Exchange (which is regulated and paid), the project simulates real-time data using a scheduler-based polling approach on their public API. While the Moroccan market lacks high-frequency data like larger exchanges (e.g. NSE, LSE), the simulation is sufficient for system behavior testing and integration validation.
