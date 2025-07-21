@@ -1,0 +1,103 @@
+[ {
+  "id" : "512335",
+  "label" : "MASI"
+}, {
+  "id" : "512343",
+  "label" : "MASI 20"
+}, {
+  "id" : "512320",
+  "label" : "MASI ESG"
+}, {
+  "id" : "512338",
+  "label" : "MASI Mid and Small Cap "
+}, {
+  "id" : "512310",
+  "label" : "MASI AGROALIMENTAIRE / PRODUCTION "
+}, {
+  "id" : "512311",
+  "label" : "MASI ASSURANCES"
+}, {
+  "id" : "512313",
+  "label" : "MASI BANQUES"
+}, {
+  "id" : "512312",
+  "label" : "MASI BATIMENT ET MATERIAUX DE CONSTRUCTION"
+}, {
+  "id" : "512314",
+  "label" : "MASI BOISSONS"
+}, {
+  "id" : "512315",
+  "label" : "MASI CHIMIE"
+}, {
+  "id" : "512316",
+  "label" : "MASI DISTRIBUTEURS"
+}, {
+  "id" : "512318",
+  "label" : "MASI ELECTRICITE"
+}, {
+  "id" : "1081951",
+  "label" : "MASI INDUSTRIE AGRICOLE"
+}, {
+  "id" : "512345",
+  "label" : "MASI INDUSTRIE PHARMACEUTIQUE"
+}, {
+  "id" : "512325",
+  "label" : "MASI INGENIERIES ET BIENS D’EQUIPEMENT INDUSTRIELS"
+}, {
+  "id" : "512327",
+  "label" : "MASI LOISIRS ET HOTELS"
+}, {
+  "id" : "512328",
+  "label" : "MASI MATERIELS,LOGICIELS ET SERVICES INFORMATIQUES"
+}, {
+  "id" : "512342",
+  "label" : "MASI MINES"
+}, {
+  "id" : "512326",
+  "label" : "MASI PARTICIPATION ET PROMOTION IMMOBILIERES"
+}, {
+  "id" : "512344",
+  "label" : "MASI PETROLE ET GAZ"
+}, {
+  "id" : "512348",
+  "label" : "MASI SANTE"
+}, {
+  "id" : "512349",
+  "label" : "MASI SERVICES DE TRANSPORT"
+}, {
+  "id" : "512350",
+  "label" : "MASI SOCIETE DE FINANCEMENT ET AUTRES ACTIVITES FINANCIERES"
+}, {
+  "id" : "512352",
+  "label" : "MASI SOCIETES DE PLACEMENT IMMOBILIER"
+}, {
+  "id" : "512351",
+  "label" : "MASI SOCIETES DE PORTEFEUILLES - HOLDINGS"
+}, {
+  "id" : "512346",
+  "label" : "MASI SYLVICULTURE ET PAPIER"
+}, {
+  "id" : "512353",
+  "label" : "MASI TELECOMMUNICATIONS"
+}, {
+  "id" : "512354",
+  "label" : "MASI TRANSPORT"
+}, {
+  "id" : "512340",
+  "label" : "MASI RENTABILITE BRUT"
+}, {
+  "id" : "512341",
+  "label" : "MASI RENTABILITE NET"
+}, {
+  "id" : "512337",
+  "label" : "MASI (EUR)"
+}, {
+  "id" : "512336",
+  "label" : "MASI (USD)"
+}, {
+  "id" : "512323",
+  "label" : "FTSE CSE Morocco 15 Index"
+}, {
+  "id" : "512324",
+  "label" : "FTSE CSE Morocco All-Liquid"
+} ]

@@ -1,0 +1,16 @@
+{
+"type":"record",
+"name":"WeightSchema",
+"namespace":"com.kafmongo.kafmongo.utils",
+"fields": [
+	{"name":"timestamp",
+	"type":"long"},
+	{"name":"portfolio_id",
+	"type":"string"},
+	{"name":"weights",
+	"type" :
+		{
+			"type" : "map",
+			"values" : "double"}
+		}]
+}

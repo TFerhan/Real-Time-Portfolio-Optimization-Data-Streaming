@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "WeightStockSchema",
+  "namespace": "com.kafmongo.kafmongo.utils",
+  "fields": [
+    {
+      "name": "time",
+      "type": "string"
+    },
+    {
+    "name" : "portfolio_id",
+    "type" : "string"},
+    
+    {
+      "name": "ticker",
+      "type": "string"
+    },
+    {
+      "name": "weight",
+      "type": "string"
+    }]
+ }
