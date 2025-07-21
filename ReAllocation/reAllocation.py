@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 
 class PortfolioOptimizer:
     def __init__(self):
-        self.SHARPE_THRESHOLD = 1.0
+        self.SHARPE_THRESHOLD = 2.5
         self.MAX_ITERATIONS = 5  
         self.GAMMA_INCREMENT = 0.001  
         self.current_gamma = 0.002
