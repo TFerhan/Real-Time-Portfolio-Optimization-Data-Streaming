@@ -1,0 +1,31 @@
+{
+  "type": "record",
+  "name": "PortfolioStatsSchema",
+  "fields": [
+    {
+      "name": "timestamp",
+      "type": "long"
+    },
+    {
+      "name": "portfolio_id",
+      "type": "string"
+    },
+    {
+      "name": "meanReturns",
+      "type": {
+        "type": "map",
+        "values": "double"
+      }
+    },
+    {
+      "name": "covarianceMatrix",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "map",
+          "values": "double"
+        }
+      }
+    }
+  ]
+}

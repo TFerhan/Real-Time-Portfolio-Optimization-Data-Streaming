@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "PortfolioMetrics",
+  "fields": [
+    {
+      "name": "risk",
+      "type": "double"
+    },
+    {
+      "name": "expectedReturn",
+      "type": "double"
+    },
+    {
+      "name": "sharpRatio",
+      "type": "double"
+    },
+    {
+      "name": "timestamp",
+      "type": "long"
+    }
+  ]
+}
